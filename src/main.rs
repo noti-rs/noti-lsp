@@ -1,16 +1,24 @@
+mod ast;
 mod backend;
-use backend::Backend;
-use tower_lsp::{LspService, Server};
+mod consts;
+mod document;
+mod features;
+mod parser;
+mod schema;
 
-const LSP_NAME: &str = env!("CARGO_PKG_NAME");
-const LSP_VERSION: &str = env!("CARGO_PKG_VERSION");
+use crate::backend::Backend;
+use dashmap::DashMap;
+use tower_lsp::{LspService, Server};
 
 #[tokio::main]
 async fn main() {
     let stdin = tokio::io::stdin();
     let stdout = tokio::io::stdout();
 
-    let (service, socket) = LspService::new(|client| Backend { client });
+    let (service, socket) = LspService::new(|client| Backend {
+        client,
+        docs: DashMap::new(),
+    });
 
     Server::new(stdin, stdout, socket).serve(service).await;
 }
