@@ -28,13 +28,17 @@ Binary will be available at: ```./target/release/noti-lsp```
 
 ```lua
 vim.filetype.add({
-  extension = { noti = "noti" },
+    extension = { noti = "noti" },
 })
 
-vim.lsp.start({
-  name = "noti-lsp",
-  cmd = { "/absolute/path/to/noti-lsp" },
-})
+vim.lsp.config.noti = {
+    cmd = { "/absolute/path/to/noti-lsp" },
+    filetypes = {
+        "noti",
+    },
+}
+
+vim.lsp.enable("noti")
 ```
 
 ## :bug: Troubleshooting
