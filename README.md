@@ -6,9 +6,9 @@
 
 | status | feature             |
 | :----: | :------------------ |
-|   🚧   | Diagnostics         |
+|   ✅   | Hover               |
+|   ✅   | Diagnostics         |
 |   🚧   | Completion          |
-|   🚧   | Hover               |
 |   🚧   | Go to definition    |
 |   🚧   | Rename              |
 
