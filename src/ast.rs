@@ -79,3 +79,9 @@ pub struct Layout {
     pub aliases: Vec<AliasDeclaration>,
     pub root: NodeType,
 }
+
+impl Layout {
+    pub fn is_alias(&self, name: &str) -> bool {
+        self.aliases.iter().any(|a| a.name == name)
+    }
+}

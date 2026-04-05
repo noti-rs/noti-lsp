@@ -9,8 +9,8 @@
 |   ✅   | Hover               |
 |   ✅   | Diagnostics         |
 |   ✅   | Completion          |
+|   ✅   | Rename              |
 |   🚧   | Go to definition    |
-|   🚧   | Rename              |
 
 ## :inbox_tray: Installation
 

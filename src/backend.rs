@@ -35,6 +35,7 @@ impl LanguageServer for Backend {
                     trigger_characters: Some(completion::completion_trigger_chars()),
                     ..Default::default()
                 }),
+                rename_provider: Some(OneOf::Left(true)),
                 ..Default::default()
             },
             server_info: Some(ServerInfo {
@@ -103,5 +104,26 @@ impl LanguageServer for Backend {
             .unwrap_or_default();
 
         Ok(Some(CompletionResponse::Array(items)))
+    }
+
+    async fn prepare_rename(
+        &self,
+        params: TextDocumentPositionParams,
+    ) -> Result<Option<PrepareRenameResponse>> {
+        let uri = params.text_document.uri.to_string();
+        let pos = params.position;
+        Ok(self
+            .docs
+            .get(&uri)
+            .and_then(|doc| features::rename::prepare_rename(&doc, pos)))
+    }
+
+    async fn rename(&self, params: RenameParams) -> Result<Option<WorkspaceEdit>> {
+        let uri = params.text_document_position.text_document.uri.to_string();
+        let pos = params.text_document_position.position;
+        Ok(self
+            .docs
+            .get(&uri)
+            .and_then(|doc| features::rename::rename(&doc, pos, params.new_name, uri.clone())))
     }
 }
