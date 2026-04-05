@@ -1,6 +1,6 @@
 # :electric_plug: noti-lsp
 
-**noti-lsp** is a language server for the `noti` layout DSL used by **Noti**.
+**noti-lsp** is a language server for the `noti` layout DSL used by [Noti](https://github.com/noti-rs/noti).
 
 ## :star2: Features
 
