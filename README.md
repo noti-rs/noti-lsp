@@ -10,7 +10,7 @@
 |   ✅   | Diagnostics         |
 |   ✅   | Completion          |
 |   ✅   | Rename              |
-|   🚧   | Go to definition    |
+|   ✅   | Go to definition    |
 
 ## :inbox_tray: Installation
 

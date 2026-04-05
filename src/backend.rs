@@ -35,6 +35,7 @@ impl LanguageServer for Backend {
                     trigger_characters: Some(completion::completion_trigger_chars()),
                     ..Default::default()
                 }),
+                definition_provider: Some(OneOf::Left(true)),
                 rename_provider: Some(OneOf::Left(true)),
                 ..Default::default()
             },
@@ -125,5 +126,22 @@ impl LanguageServer for Backend {
             .docs
             .get(&uri)
             .and_then(|doc| features::rename::rename(&doc, pos, params.new_name, uri.clone())))
+    }
+
+    async fn goto_definition(
+        &self,
+        params: GotoDefinitionParams,
+    ) -> Result<Option<GotoDefinitionResponse>> {
+        let uri = params
+            .text_document_position_params
+            .text_document
+            .uri
+            .clone();
+        let pos = params.text_document_position_params.position;
+
+        Ok(self
+            .docs
+            .get(&uri.to_string())
+            .and_then(|doc| features::definition::goto_definition(&doc, pos, &uri)))
     }
 }
