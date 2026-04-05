@@ -1,6 +1,6 @@
 use crate::consts::{LSP_NAME, LSP_VERSION};
 use crate::document::Document;
-use crate::features;
+use crate::features::{self, completion};
 use dashmap::DashMap;
 use tower_lsp::jsonrpc::Result;
 use tower_lsp::lsp_types::*;
@@ -31,6 +31,10 @@ impl LanguageServer for Backend {
                     TextDocumentSyncKind::FULL,
                 )),
                 hover_provider: Some(HoverProviderCapability::Simple(true)),
+                completion_provider: Some(CompletionOptions {
+                    trigger_characters: Some(completion::completion_trigger_chars()),
+                    ..Default::default()
+                }),
                 ..Default::default()
             },
             server_info: Some(ServerInfo {
@@ -86,5 +90,18 @@ impl LanguageServer for Backend {
             .and_then(|doc| features::hover::get_hover(&doc, pos));
 
         Ok(result)
+    }
+
+    async fn completion(&self, params: CompletionParams) -> Result<Option<CompletionResponse>> {
+        let uri = params.text_document_position.text_document.uri.to_string();
+        let pos = params.text_document_position.position;
+
+        let items = self
+            .docs
+            .get(&uri)
+            .map(|doc| completion::get_completions(&doc, pos))
+            .unwrap_or_default();
+
+        Ok(Some(CompletionResponse::Array(items)))
     }
 }

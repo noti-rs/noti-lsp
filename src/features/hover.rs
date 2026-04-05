@@ -1,5 +1,5 @@
 use crate::ast::{
-    AliasDeclaration, Layout, NodeType, Property, PropertyValue, Span, TypeValue, TypeValueInner,
+    AliasDeclaration, Layout, NodeType, Property, PropertyValue, TypeValue, TypeValueInner,
 };
 use crate::document::Document;
 use crate::schema;
@@ -23,7 +23,7 @@ fn hover_in_layout(layout: &Layout, offset: usize) -> Option<Hover> {
 
 fn hover_in_alias(alias: &AliasDeclaration, offset: usize) -> Option<Hover> {
     // Hovering the alias name itself
-    if span_contains(&alias.name_span, offset) {
+    if alias.name_span.contains(offset) {
         let target_type = schema::lookup(&alias.target.name);
         let base_desc = target_type
             .map(|t| t.description)
@@ -42,7 +42,7 @@ fn hover_in_alias(alias: &AliasDeclaration, offset: usize) -> Option<Hover> {
 
 fn hover_in_node(node: &NodeType, offset: usize, aliases: &[AliasDeclaration]) -> Option<Hover> {
     // Hovering the component name
-    if span_contains(&node.name_span, offset) {
+    if node.name_span.contains(offset) {
         return Some(hover_for_type_name(&node.name, aliases));
     }
 
@@ -70,7 +70,7 @@ fn hover_in_property(
     aliases: &[AliasDeclaration],
 ) -> Option<Hover> {
     // Hovering the key
-    if span_contains(&prop.key_span, offset) {
+    if prop.key_span.contains(offset) {
         return Some(hover_for_prop_key(&prop.key, parent_name, aliases));
     }
 
@@ -89,14 +89,14 @@ fn hover_in_property_value(
         PropertyValue::Type(tv) => hover_in_type_value(tv, offset, aliases),
 
         PropertyValue::Literal(lit, span) => {
-            if span_contains(span, offset) {
+            if span.contains(offset) {
                 return Some(hover_for_literal(lit, prop_key, parent_name, aliases));
             }
             None
         }
 
         PropertyValue::UInt(n, span) => {
-            if span_contains(span, offset) {
+            if span.contains(offset) {
                 return Some(make_hover(format!("`{n}` — unsigned integer")));
             }
             None
@@ -109,7 +109,7 @@ fn hover_in_type_value(
     offset: usize,
     aliases: &[AliasDeclaration],
 ) -> Option<Hover> {
-    if span_contains(&tv.name_span, offset) {
+    if tv.name_span.contains(offset) {
         return Some(hover_for_type_name(&tv.name, aliases));
     }
 
@@ -207,10 +207,6 @@ fn value_kind_hint(kind: &schema::ValueKind) -> String {
         schema::ValueKind::UInt => "unsigned integer".to_string(),
         schema::ValueKind::Literal => "literal string".to_string(),
     }
-}
-
-fn span_contains(span: &Span, offset: usize) -> bool {
-    offset >= span.start && offset < span.end
 }
 
 fn make_hover(text: String) -> Hover {

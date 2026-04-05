@@ -290,33 +290,9 @@ fn check_type_value(
     }
 }
 
-// fn resolve_real_name<'a>(name: &'a str, aliases: &'a [AliasDeclaration]) -> &'a str {
-//     let mut current = name;
-//
-//     for _ in 0..16 {
-//         if schema::lookup(current).is_some() {
-//             return current;
-//         }
-//         if let Some(alias) = aliases.iter().find(|a| a.name == current) {
-//             current = &alias.target.name;
-//         } else {
-//             return current;
-//         }
-//     }
-//
-//     current
-// }
-
-fn span_to_range(doc: &Document, span: &Span) -> Range {
-    Range {
-        start: doc.offset_to_position(span.start),
-        end: doc.offset_to_position(span.end),
-    }
-}
-
 fn error(doc: &Document, span: &Span, message: String) -> Diagnostic {
     Diagnostic {
-        range: span_to_range(doc, span),
+        range: span.to_range(doc),
         severity: Some(DiagnosticSeverity::ERROR),
         source: Some(LSP_NAME.to_string()),
         message,
@@ -326,7 +302,7 @@ fn error(doc: &Document, span: &Span, message: String) -> Diagnostic {
 
 fn warning(doc: &Document, span: &Span, message: String) -> Diagnostic {
     Diagnostic {
-        range: span_to_range(doc, span),
+        range: span.to_range(doc),
         severity: Some(DiagnosticSeverity::WARNING),
         source: Some(LSP_NAME.to_string()),
         message,

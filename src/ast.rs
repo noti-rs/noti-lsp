@@ -1,3 +1,6 @@
+use crate::document::Document;
+use tower_lsp::lsp_types::Range;
+
 #[derive(Debug, Clone)]
 pub struct Span {
     pub start: usize,
@@ -9,6 +12,17 @@ impl Span {
         Self {
             start: span.start(),
             end: span.end(),
+        }
+    }
+
+    pub fn contains(&self, offset: usize) -> bool {
+        offset >= self.start && offset < self.end
+    }
+
+    pub fn to_range(&self, doc: &Document) -> Range {
+        Range {
+            start: doc.offset_to_position(self.start),
+            end: doc.offset_to_position(self.end),
         }
     }
 }

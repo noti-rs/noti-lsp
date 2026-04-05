@@ -11,20 +11,6 @@ pub struct Document {
 }
 
 impl Document {
-    // pub fn new(source: String) -> Self {
-    //     let lines = line_offsets(&source);
-    //     let (layout, errors) = match parser::parse(&source) {
-    //         Ok(l) => (Some(l), vec![]),
-    //         Err(e) => (None, vec![e]),
-    //     };
-    //     Self {
-    //         source,
-    //         layout,
-    //         errors,
-    //         lines,
-    //     }
-    // }
-
     pub fn new(source: String) -> Self {
         // NOTE: temporary, since im working on windows rn
         let source = source.replace("\r\n", "\n");
