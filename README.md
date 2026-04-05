@@ -26,11 +26,9 @@ Binary will be available at: ```./target/release/noti-lsp```
 
 ### Neovim (0.11+)
 
-```lua
-vim.filetype.add({
-    extension = { noti = "noti" },
-})
+Requirements: [noti.nvim](https://github.com/noti-rs/noti.nvim)
 
+```lua
 vim.lsp.config.noti = {
     cmd = { "/absolute/path/to/noti-lsp" },
     filetypes = {
