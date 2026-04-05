@@ -8,7 +8,7 @@
 | :----: | :------------------ |
 |   ✅   | Hover               |
 |   ✅   | Diagnostics         |
-|   🚧   | Completion          |
+|   ✅   | Completion          |
 |   🚧   | Go to definition    |
 |   🚧   | Rename              |
 
