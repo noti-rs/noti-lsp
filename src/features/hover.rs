@@ -156,7 +156,7 @@ fn hover_for_type_name(name: &str, aliases: &[AliasDeclaration]) -> Hover {
 
 fn hover_for_prop_key(key: &str, parent_name: &str, aliases: &[AliasDeclaration]) -> Hover {
     // Resolve the real type (follow alias if needed)
-    let real_name = resolve_real_name(parent_name, aliases);
+    let real_name = crate::utils::resolve_real_alias_name(parent_name, aliases);
 
     if let Some(def) = schema::lookup(real_name) {
         if let Some(prop) = def.find_prop(key) {
@@ -177,7 +177,7 @@ fn hover_for_literal(
     parent_name: &str,
     aliases: &[AliasDeclaration],
 ) -> Hover {
-    let real_name = resolve_real_name(parent_name, aliases);
+    let real_name = crate::utils::resolve_real_alias_name(parent_name, aliases);
 
     if let Some(def) = schema::lookup(real_name) {
         if let Some(prop) = def.find_prop(prop_key) {
@@ -196,25 +196,6 @@ fn hover_for_literal(
     }
 
     make_hover(format!("`{lit}`"))
-}
-
-/// Follow an alias chain to find the underlying built-in type name
-fn resolve_real_name<'a>(name: &'a str, aliases: &'a [AliasDeclaration]) -> &'a str {
-    let mut current = name;
-
-    // guard against circular aliases (max 16 hops)
-    for _ in 0..16 {
-        if schema::lookup(current).is_some() {
-            return current;
-        }
-        if let Some(alias) = aliases.iter().find(|a| a.name == current) {
-            current = &alias.target.name;
-        } else {
-            return current;
-        }
-    }
-
-    current
 }
 
 fn value_kind_hint(kind: &schema::ValueKind) -> String {

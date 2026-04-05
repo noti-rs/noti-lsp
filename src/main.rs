@@ -5,6 +5,7 @@ mod document;
 mod features;
 mod parser;
 mod schema;
+mod utils;
 
 use crate::backend::Backend;
 use dashmap::DashMap;

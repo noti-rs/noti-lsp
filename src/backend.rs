@@ -14,7 +14,7 @@ pub struct Backend {
 impl Backend {
     async fn update_document(&self, uri: Url, source: String) {
         let doc = Document::new(source);
-        let diagnostics = vec![]; // TODO: get diagnostics
+        let diagnostics = features::diagnostics::make_diagnostics(&doc);
         self.docs.insert(uri.to_string(), doc);
         self.client
             .publish_diagnostics(uri, diagnostics, None)
