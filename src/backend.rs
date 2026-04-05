@@ -14,7 +14,6 @@ impl LanguageServer for Backend {
     async fn initialize(&self, _: InitializeParams) -> Result<InitializeResult> {
         Ok(InitializeResult {
             capabilities: ServerCapabilities {
-                // We'll fill these in as we add features
                 ..Default::default()
             },
             server_info: Some(ServerInfo {
