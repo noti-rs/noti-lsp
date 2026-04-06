@@ -1,4 +1,5 @@
 use crate::ast::AliasDeclaration;
+use crate::schema::ValueKind;
 
 pub fn resolve_real_alias_name<'a>(name: &'a str, aliases: &'a [AliasDeclaration]) -> &'a str {
     let mut current = name;
@@ -16,4 +17,13 @@ pub fn resolve_real_alias_name<'a>(name: &'a str, aliases: &'a [AliasDeclaration
     }
 
     current
+}
+
+pub fn value_kind_hint(kind: &ValueKind) -> String {
+    match kind {
+        ValueKind::Enum(variants) => format!("`{}`", variants.join("` | `")),
+        ValueKind::Type(name) => format!("`{name}(...)`"),
+        ValueKind::UInt => "unsigned integer".to_string(),
+        ValueKind::Literal => "literal string".to_string(),
+    }
 }

@@ -160,7 +160,7 @@ fn hover_for_prop_key(key: &str, parent_name: &str, aliases: &[AliasDeclaration]
 
     if let Some(def) = schema::lookup(real_name) {
         if let Some(prop) = def.find_prop(key) {
-            let value_hint = value_kind_hint(&prop.value);
+            let value_hint = crate::utils::value_kind_hint(&prop.value);
             return make_hover(format!(
                 "**`{key}`** — {}\n\n*Value:* {value_hint}",
                 prop.description,
@@ -196,17 +196,6 @@ fn hover_for_literal(
     }
 
     make_hover(format!("`{lit}`"))
-}
-
-fn value_kind_hint(kind: &schema::ValueKind) -> String {
-    match kind {
-        schema::ValueKind::Enum(variants) => {
-            format!("`{}` (enum)", variants.join("` | `"))
-        }
-        schema::ValueKind::Type(name) => format!("`{name}(...)`"),
-        schema::ValueKind::UInt => "unsigned integer".to_string(),
-        schema::ValueKind::Literal => "literal string".to_string(),
-    }
 }
 
 fn make_hover(text: String) -> Hover {

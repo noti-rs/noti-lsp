@@ -2,8 +2,8 @@ use crate::ast::{Layout, NodeType, PropertyValue, TypeValueInner};
 use crate::document::Document;
 use crate::schema::{self, ValueKind};
 use tower_lsp::lsp_types::{
-    CompletionItem, CompletionItemKind, Documentation, InsertTextFormat, MarkupContent, MarkupKind,
-    Position,
+    CompletionItem, CompletionItemKind, CompletionTextEdit, Documentation, InsertTextFormat,
+    MarkupContent, MarkupKind, Position, Range, TextEdit,
 };
 
 pub fn completion_trigger_chars() -> Vec<String> {
@@ -193,7 +193,7 @@ fn complete_prop_keys(type_name: &str, layout: &Layout) -> Vec<CompletionItem> {
                     value: format!(
                         "{}\n\n*Value:* {}",
                         p.description,
-                        value_kind_hint(&p.value)
+                        crate::utils::value_kind_hint(&p.value)
                     ),
                 })),
                 insert_text: Some(snippet),
@@ -224,6 +224,10 @@ fn complete_prop_value(
             .map(|v| CompletionItem {
                 label: v.to_string(),
                 kind: Some(CompletionItemKind::ENUM_MEMBER),
+                text_edit: Some(CompletionTextEdit::Edit(TextEdit {
+                    range: current_word_range(doc, pos),
+                    new_text: v.to_string(),
+                })),
                 ..Default::default()
             })
             .collect(),
@@ -248,11 +252,24 @@ fn complete_prop_value(
     }
 }
 
-fn value_kind_hint(kind: &ValueKind) -> String {
-    match kind {
-        ValueKind::Enum(variants) => format!("`{}`", variants.join("` | `")),
-        ValueKind::Type(name) => format!("`{name}(...)`"),
-        ValueKind::UInt => "unsigned integer".to_string(),
-        ValueKind::Literal => "literal string".to_string(),
+fn current_word_range(doc: &Document, pos: Position) -> Range {
+    let offset = doc.position_to_offset(pos);
+    let src = doc.source.as_bytes();
+
+    let is_word = |b: u8| b.is_ascii_alphanumeric() || b == b'_' || b == b'-';
+
+    let mut start = offset;
+    while start > 0 && is_word(src[start - 1]) {
+        start -= 1;
+    }
+
+    let mut end = offset;
+    while end < src.len() && is_word(src[end]) {
+        end += 1;
+    }
+
+    Range {
+        start: doc.offset_to_position(start),
+        end: doc.offset_to_position(end),
     }
 }
