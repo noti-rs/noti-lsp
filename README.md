@@ -11,6 +11,7 @@
 |   ✅   | Completion          |
 |   ✅   | Rename              |
 |   ✅   | Go to definition    |
+|   ✅   | Inlay hints         |
 
 ## :inbox_tray: Installation
 

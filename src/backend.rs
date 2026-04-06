@@ -1,6 +1,6 @@
 use crate::consts::{LSP_NAME, LSP_VERSION};
 use crate::document::Document;
-use crate::features::{self, completion};
+use crate::features::*;
 use dashmap::DashMap;
 use tower_lsp::jsonrpc::Result;
 use tower_lsp::lsp_types::*;
@@ -14,7 +14,7 @@ pub struct Backend {
 impl Backend {
     async fn update_document(&self, uri: Url, source: String) {
         let doc = Document::new(source);
-        let diagnostics = features::diagnostics::make_diagnostics(&doc);
+        let diagnostics = diagnostics::make_diagnostics(&doc);
         self.docs.insert(uri.to_string(), doc);
         self.client
             .publish_diagnostics(uri, diagnostics, None)
@@ -37,6 +37,7 @@ impl LanguageServer for Backend {
                 }),
                 definition_provider: Some(OneOf::Left(true)),
                 rename_provider: Some(OneOf::Left(true)),
+                inlay_hint_provider: Some(OneOf::Left(true)),
                 ..Default::default()
             },
             server_info: Some(ServerInfo {
@@ -89,7 +90,7 @@ impl LanguageServer for Backend {
         let result = self
             .docs
             .get(&uri)
-            .and_then(|doc| features::hover::get_hover(&doc, pos));
+            .and_then(|doc| hover::get_hover(&doc, pos));
 
         Ok(result)
     }
@@ -116,7 +117,7 @@ impl LanguageServer for Backend {
         Ok(self
             .docs
             .get(&uri)
-            .and_then(|doc| features::rename::prepare_rename(&doc, pos)))
+            .and_then(|doc| rename::prepare_rename(&doc, pos)))
     }
 
     async fn rename(&self, params: RenameParams) -> Result<Option<WorkspaceEdit>> {
@@ -125,7 +126,7 @@ impl LanguageServer for Backend {
         Ok(self
             .docs
             .get(&uri)
-            .and_then(|doc| features::rename::rename(&doc, pos, params.new_name, uri.clone())))
+            .and_then(|doc| rename::rename(&doc, pos, params.new_name, uri.clone())))
     }
 
     async fn goto_definition(
@@ -142,6 +143,17 @@ impl LanguageServer for Backend {
         Ok(self
             .docs
             .get(&uri.to_string())
-            .and_then(|doc| features::definition::goto_definition(&doc, pos, &uri)))
+            .and_then(|doc| definition::goto_definition(&doc, pos, &uri)))
+    }
+
+    async fn inlay_hint(&self, params: InlayHintParams) -> Result<Option<Vec<InlayHint>>> {
+        let uri = params.text_document.uri.to_string();
+        let hints = self
+            .docs
+            .get(&uri)
+            .map(|doc| inlay_hints::get_inlay_hints(&doc, params.range))
+            .unwrap_or_default();
+
+        Ok(Some(hints))
     }
 }
